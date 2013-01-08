@@ -6,10 +6,45 @@ class HtmlExport
     @out_dir = out_dir
     @gcov_for_files = gcov_for_files
     @base_dir = base_dir
+    export_css()
     export_toc()
     export_sources()
   end
+  def export_css()
+    open_for_write(File.join(@out_dir, 'gcov.css')) do |out|
+      out.puts(<<-eos
+body {
+    color: #000000;
+    background-color: #fff;
+}
 
+.source {
+    font-family: monospaced;
+    background-color: #fff;
+}
+
+.dead_code {
+    background-color: #FF6230;
+}
+
+.ignored_code {
+}
+
+.used_code {
+    background-color: #CAD7FE;;
+}
+
+
+.not_covered {
+    background-color: #FF6230;
+}
+
+.covered {
+}
+eos
+)
+    end
+  end
   def export_toc
     output_file_name = File.join(@out_dir, 'index.html')
     open_for_write(output_file_name) do |out|
@@ -19,6 +54,7 @@ class HtmlExport
       total_lines = 0
       total_covered_lines = 0
       @gcov_for_files.each do |file, coverage|
+        puts "working on #{file}"
         relative_file = file.gsub(@base_dir, '')
         stats = Gcov::FileStatistics.new(coverage)
         total_lines += stats.total_lines_of_code
@@ -39,8 +75,13 @@ class HtmlExport
       relative_file = file.gsub(@base_dir, '')
       output_file_name = File.join(@out_dir, relative_file + '.html')
       path_to_stylesheet = calc_path_to_stylesheet(output_file_name, @out_dir)
+      if path_to_stylesheet.size > 0
+        path_to_stylesheet = File.join(path_to_stylesheet, 'gcov.css')
+      else
+        path_to_stylesheet = 'gcov.css'
+      end
       open_for_write(output_file_name) do |out|
-        out.puts("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"#{File.join(path_to_stylesheet, 'gcov.css')}\"></head><body><pre>")
+        out.puts("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"#{path_to_stylesheet}\"></head><body><pre>")
         coverage.each do |line|
           line_number = sprintf("%5d:", line.line_number)
           count_state = count_state_to_css_class(line.hit_count)
