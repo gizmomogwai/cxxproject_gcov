@@ -12,37 +12,8 @@ class HtmlExport
   end
   def export_css()
     open_for_write(File.join(@out_dir, 'gcov.css')) do |out|
-      out.puts(<<-eos
-body {
-    color: #000000;
-    background-color: #fff;
-}
-
-.source {
-    font-family: monospaced;
-    background-color: #fff;
-}
-
-.dead_code {
-    background-color: #FF6230;
-}
-
-.ignored_code {
-}
-
-.used_code {
-    background-color: #CAD7FE;;
-}
-
-
-.not_covered {
-    background-color: #FF6230;
-}
-
-.covered {
-}
-eos
-)
+      data = File.read(File.join(File.dirname(__FILE__), 'gcov.css'))
+      out.puts(data)
     end
   end
   def export_toc
