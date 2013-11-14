@@ -6,6 +6,7 @@ require File.expand_path("lib/#{gem_name}/version")
 Gem::Specification.new do |gem|
   gem.name          = gem_name
   gem.version       = CxxprojectGcov::VERSION
+  gem.license       = 'MIT'
 
   gem.authors       = ["Christian Köstlin"]
   gem.email         = ["christian.koestlin@esrlabs.com"]
